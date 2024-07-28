@@ -7,6 +7,11 @@ from app.routes.responses import responses_bp
 from config import DevelopmentConfig
 
 
+def drop_all_tables(app):
+    with app.app_context():
+        db.reflect()
+        db.drop_all()
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(DevelopmentConfig)
