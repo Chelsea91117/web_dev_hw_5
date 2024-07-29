@@ -1,8 +1,8 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
 
-from app.models import Question, db
-from app.schemas.questions import QuestionCreate, QuestionResponse
+from app.models import Question, db, Category
+from app.schemas.questions import QuestionCreate, QuestionResponse, CategoryBase
 
 questions_bp = Blueprint('questions', __name__, url_prefix='/questions')
 
@@ -37,8 +37,8 @@ def create_question():
     db.session.add(question)
     db.session.commit()
 
-    return jsonify({'message': 'Question created', 'id': question.id}), 201
-
+    # return jsonify({'message': 'Question created', 'id': question.id}), 201
+    return jsonify(QuestionResponse(id=question.id, text=question.text).dict()), 201
 
 @questions_bp.route('/<int:question_id>', methods=['PUT'])
 def update_question(question_id):
@@ -66,4 +66,6 @@ def delete_question(question_id):
     db.session.delete(question)
     db.session.commit()
     return jsonify({'message': f'Question {question.id} deleted'}), 200
+
+
 
