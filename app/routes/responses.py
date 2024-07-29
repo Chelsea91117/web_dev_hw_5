@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.models import Statistic, Question, db
+from app.models import Statistic, Question, db, Response
 
 responses_bp = Blueprint('responses', __name__, url_prefix='/responses')
 

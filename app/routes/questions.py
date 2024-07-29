@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
 
 from app.models import Question, db, Category
-from app.schemas.questions import QuestionCreate, QuestionResponse, CategoryBase
+from app.schemas.questions import QuestionCreate, QuestionResponse
 
 questions_bp = Blueprint('questions', __name__, url_prefix='/questions')
 
@@ -21,6 +21,7 @@ def get_questions():
     results = [QuestionResponse.from_orm(question).dict() for question in questions]
     return jsonify(results)
 
+
 @questions_bp.route('/', methods=['POST'])
 def create_question():
     data = request.get_json()
@@ -29,16 +30,20 @@ def create_question():
         question_data = QuestionCreate(**data)
     except ValidationError as e:
         return jsonify(e.errors()), 400
+    category = Category.query.get(question_data.category_id)
+    if not category:
+        return jsonify({"message": "Категория с таким ID не найдена"}), 404
 
     # if not data or 'text' not in data:
     #     return jsonify({'error': 'Missing data'}), 400
 
-    question = Question(text=data['text'])
+    question = Question(text=question_data['text'], category_id=category['id'])
     db.session.add(question)
     db.session.commit()
 
     # return jsonify({'message': 'Question created', 'id': question.id}), 201
-    return jsonify(QuestionResponse(id=question.id, text=question.text).dict()), 201
+    return jsonify(QuestionResponse.from_orm(question).dict()), 201
+
 
 @questions_bp.route('/<int:question_id>', methods=['PUT'])
 def update_question(question_id):
@@ -50,10 +55,19 @@ def update_question(question_id):
     data = request.get_json()
     if 'text' in data:
         question.text = data['text']
-        db.session.commit()
-        return jsonify({'message': 'Question updated'}), 200
-    else:
-        return jsonify({'message': 'Missing text'}), 400
+    if 'category_id' in data:
+        question.category_id = data['category_id']
+    db.session.commit()
+    return jsonify({'message': 'Question updated'}), 200
+
+
+@questions_bp.route('/<int:id>', methods=['GET'])
+def get_question(id):
+    """Получение деталей конкретного вопроса по его ID."""
+    question = Question.query.get(id)
+    if question is None:
+        return jsonify({'message': "Вопрос с таким ID не найден"}), 404
+    return jsonify(QuestionResponse.from_orm(question).dict()), 200
 
 
 @questions_bp.route('/<int:question_id>', methods=['DELETE'])
