@@ -8,6 +8,5 @@ class Category(db.Model):
 
      questions = db.relationship("Question", back_populates="category")
 
-
     def __repr__(self):
         return f'Category {self.id}: {self.name}'

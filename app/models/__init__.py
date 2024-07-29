@@ -4,3 +4,6 @@ db = SQLAlchemy()
 
 from app.models.questions import *
 from app.models.responses import *
+from app.models.categories import *
+
+
