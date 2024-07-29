@@ -29,9 +29,12 @@ def add_response():
     if not question:
         return jsonify({'message': "Вопрос не найден"}), 404
 
+    # Преобразуем строковое значение 'true'/'false' в булево
+    is_agree = data['is_agree'].lower() == 'true'
+
     response = Response(
         question_id=question.id,
-        is_agree=data['is_agree']
+        is_agree=is_agree
     )
     db.session.add(response)
 
@@ -40,7 +43,8 @@ def add_response():
     if not statistic:
         statistic = Statistic(question_id=question.id, agree_count=0, disagree_count=0)
         db.session.add(statistic)
-    if data['is_agree']:
+
+    if is_agree:  # Используем преобразованное булево значение здесь
         statistic.agree_count += 1
     else:
         statistic.disagree_count += 1

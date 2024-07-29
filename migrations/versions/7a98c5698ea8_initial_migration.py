@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: d2807cb30817
+Revision ID: 7a98c5698ea8
 Revises: 
-Create Date: 2024-07-28 17:03:38.623636
+Create Date: 2024-07-29 21:54:12.282011
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd2807cb30817'
+revision = '7a98c5698ea8'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,28 +21,28 @@ def upgrade():
     op.create_table('categories',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=30), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_categories'))
     )
     op.create_table('questions',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('text', sa.String(length=255), nullable=False),
     sa.Column('category_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], name=op.f('fk_questions_category_id_categories')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_questions'))
     )
     op.create_table('responses',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('question_id', sa.Integer(), nullable=False),
     sa.Column('is_agree', sa.Boolean(), nullable=False),
-    sa.ForeignKeyConstraint(['question_id'], ['questions.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['question_id'], ['questions.id'], name=op.f('fk_responses_question_id_questions')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_responses'))
     )
     op.create_table('statistics',
     sa.Column('question_id', sa.Integer(), nullable=False),
     sa.Column('agree_count', sa.Integer(), nullable=False),
     sa.Column('disagree_count', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['question_id'], ['questions.id'], ),
-    sa.PrimaryKeyConstraint('question_id')
+    sa.ForeignKeyConstraint(['question_id'], ['questions.id'], name=op.f('fk_statistics_question_id_questions')),
+    sa.PrimaryKeyConstraint('question_id', name=op.f('pk_statistics'))
     )
     # ### end Alembic commands ###
 

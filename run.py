@@ -1,4 +1,4 @@
-from app import create_app, drop_all_tables
+from app import create_app
 
 app = create_app()
 

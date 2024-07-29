@@ -21,7 +21,7 @@ def create_category():
     except ValidationError as e:
         return jsonify(e.errors()), 400
 
-    category = Category(name=category_data['name'])
+    category = Category(name=category_data.name)
     db.session.add(category)
     db.session.commit()
 
@@ -43,7 +43,7 @@ def update_category(id):
     else:
         return jsonify({'message': 'Missing name'}), 400
 
-@categories_bp.route('/<int:id', methods=['DELETE'])
+@categories_bp.route('/<int:id>', methods=['DELETE'])
 def delete_category(id):
     category = Category.query.get(id)
 
